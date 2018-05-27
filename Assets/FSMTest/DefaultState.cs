@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NP.FSM;
+using NP.FiniteStateMachine;
 
 public class DefaultState : FSMState {
 
@@ -15,8 +15,17 @@ public class DefaultState : FSMState {
 
 		Debug.Log ("Default state update");
 
-		if (Input.GetKey (KeyCode.W))
-			Owner.ChangeState<WalkingState> ();
+		if (Input.GetKey (KeyCode.W)) {
+			//Owner.ChangeState<WalkingState> ();
+			Owner.PushInState<WalkingState> ();
+			return;
+		}
+
+		if (Input.GetKey (KeyCode.W) && Input.GetKey (KeyCode.LeftShift)) {
+			Owner.PushInState<RunningState> ();
+		
+			return;
+		}
 	}
 
 	public override void Initialize (FSM owner)

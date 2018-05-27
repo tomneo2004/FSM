@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NP.FSM;
+using NP.FiniteStateMachine;
 
 public class FSMTest : MonoBehaviour {
 
@@ -21,7 +21,7 @@ public class FSMTest : MonoBehaviour {
 			stateMachine.AddState<WalkingState>();
 
 			//change state to default at start
-			stateMachine.ChangeState<DefaultState>();
+			stateMachine.PushInState<DefaultState>();
 		}
 	}
 	

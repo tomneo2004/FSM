@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NP.FSM;
+using NP.FiniteStateMachine;
 
 public class RunningState : FSMState {
 
@@ -16,12 +16,12 @@ public class RunningState : FSMState {
 		Debug.Log ("Running state update");
 
 		if (Input.GetKeyUp (KeyCode.W)) {
-			Owner.ChangeState<DefaultState> ();
+			Owner.PopState();
 			return;
 		}
 
 		if (Input.GetKeyUp (KeyCode.LeftShift)) {
-			Owner.ChangeState<WalkingState> ();
+			Owner.PopState();
 			return;
 		}
 	}

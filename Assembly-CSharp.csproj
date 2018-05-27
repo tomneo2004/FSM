@@ -57,6 +57,7 @@
      <Compile Include="Assets\FSMTest\FSMTest.cs" />
      <Compile Include="Assets\FSMTest\RunningState.cs" />
      <Compile Include="Assets\FSMTest\WalkingState.cs" />
+     <Compile Include="Assets\Utility.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
