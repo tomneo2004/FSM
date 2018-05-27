@@ -235,7 +235,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   machineName: 
-  currentState: {fileID: 0}
+  states: []
 --- !u!212 &392713246
 SpriteRenderer:
   m_ObjectHideFlags: 0

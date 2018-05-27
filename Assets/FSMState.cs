@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NP.FSM;
+using NP.FiniteStateMachine;
 
-namespace NP.FSM{
+namespace NP.FiniteStateMachine{
 
 	public interface IFSMState{
 
@@ -99,6 +99,7 @@ namespace NP.FSM{
 		void Update () {
 
 		}
+			
 	}
 
 	public class FSMRootState: FSMState{

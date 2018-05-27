@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NP.FSM;
+using UnityEditor;
+using NP.FiniteStateMachine;
 
-namespace NP.FSM{
+namespace NP.FiniteStateMachine{
 
 	public class FSM : MonoBehaviour {
 
@@ -18,23 +19,38 @@ namespace NP.FSM{
 			get{
 				return machineName;
 			}
+
+			set{
+				machineName = value;
+			}
 		}
 
 		//List of available state
+		[SerializeField]
 		List<FSMState> states = new List<FSMState>();
 
-		//Current state that is running
-		[SerializeField]
-		FSMState currentState;
-
 		/**
-		 * Get current state that is running
+		 * Get current running state
 		 **/
 		public FSMState CurrentState{
 		
+			get{ 
+			
+				return RunningState ();
+			}
+		}
+
+		//State queue
+		readonly Stack<FSMState> stateQueue = new Stack<FSMState>();
+
+		/**
+		 * Get state queue
+		 **/
+		public Stack<FSMState> StateQueue{
+
 			get{
 
-				return currentState;
+				return stateQueue;
 			}
 		}
 
@@ -53,7 +69,109 @@ namespace NP.FSM{
 		void Update () {
 
 		}
-			
+
+		/**
+		 * Find state
+		 **/
+		private StateType FindState<StateType>() where StateType : FSMState{
+
+
+			foreach (FSMState s in states) {
+
+				if (s is StateType) {
+
+					return (StateType)s;
+				}
+			}
+
+			return null;
+		}
+
+		/**
+		 * Get current running state
+		 * 
+		 * Return null if no running state
+		 **/
+		private FSMState RunningState(){
+
+			if (stateQueue.Count > 0) {
+
+				return stateQueue.Peek();
+			}
+
+			#if DEBUG
+			Debug.LogWarning ("No running state");
+			#endif
+
+			return null;
+		}
+
+		/**
+		 * Push state
+		 * 
+		 * Return true if successful otherwise false
+		 **/
+		public virtual bool PushInState<StateType>() where StateType : FSMState, new(){
+
+			StateType inState = FindState<StateType> ();
+
+			//Create state if not exist
+			if (inState == null) {
+
+				inState = AddState<StateType> ();
+			}
+
+			//Push in state if state is existed
+			if (inState) {
+
+				//Tell running state to exit
+				FSMState runningState = RunningState ();
+				if (runningState != null) {
+
+					(runningState as IFSMState).OnExit ();
+				}
+
+				//push in new state
+				stateQueue.Push (inState);
+
+				//Tell new state to enter
+				(inState as IFSMState).OnEnter ();
+
+				return true;
+			}
+
+
+			return false;
+		}
+
+		/**
+		 * Pop current running state
+		 * 
+		 * Return null if pop state fail otherwise popped state
+		 **/
+		public virtual FSMState PopState(){
+		
+			FSMState popState = RunningState ();
+
+			//If we have current running state
+			if (popState) {
+
+				//Tell current running state to exit
+				(popState as IFSMState).OnExit();
+
+				//Pop state
+				stateQueue.Pop();
+			}
+
+			//Tell next state to enter
+			FSMState runningState = RunningState ();
+			if (runningState) {
+
+				(runningState as IFSMState).OnEnter ();
+			}
+
+			return popState;
+		}
 
 		protected virtual bool ChangeState(FSMState toState){
 
@@ -67,48 +185,29 @@ namespace NP.FSM{
 				return successful;
 			}
 
-			#if DEBUG
-			if (currentState == null) {
-				Debug.LogWarning ("Current state is null");
+			//Tell current running state to exit and pop it
+			FSMState runningState = RunningState ();
+			if (runningState) {
+
+				(runningState as IFSMState).OnExit ();
+				stateQueue.Pop ();
 			}
-			#endif
 
+			//Push in new state and tell it to enter
+			stateQueue.Push(toState);
+			(toState as IFSMState).OnEnter ();
 
-			if (toState && toState != currentState) {
+			successful = true;
 
-				//If we have current state then tell current state to exit
-				if (currentState) {
-
-					(currentState as IFSMState).OnExit ();
-				}
-
-				//Set to current state
-				currentState = toState;
-
-				//Tell new state to enter state
-				(toState as IFSMState).OnEnter();
-
-				successful = true;
-			}
-				
-		
 			return successful;
 		}
 
+		/**
+		 * Change current running state to new state
+		 **/
 		public virtual bool ChangeState<StateType>() where StateType : FSMState, new(){
 
-			FSMState destState = null;
-
-			//If state is existed in list
-			foreach (FSMState s in states) {
-			
-				if (s is StateType) {
-				
-					destState = s;
-
-					break;
-				}
-			}
+			FSMState destState = FindState<StateType>();
 
 			//Create state if we can't find it
 			if (destState == null) {
@@ -120,6 +219,11 @@ namespace NP.FSM{
 			return ChangeState(destState);
 		}
 
+		/**
+		 * Add state into state list
+		 * 
+		 * Return true if added otherwise false
+		 **/
 		protected virtual bool AddState(FSMState newState){
 
 			bool successful = false;
@@ -142,6 +246,13 @@ namespace NP.FSM{
 			return successful;
 		}
 
+		/**
+		 * Create new state and add it into state list by given state type 
+		 * 
+		 * New created state will be attached to gameobject that have this FSM
+		 * 
+		 * Return an instance of state type
+		 **/
 		public virtual StateType AddState<StateType>() where StateType : FSMState, new(){
 
 			//If state has been added
