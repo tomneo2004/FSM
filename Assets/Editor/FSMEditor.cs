@@ -37,8 +37,8 @@ namespace NP.NPEditor.FSMEditor{
 			EditorGUI.indentLevel--;
 
 			//state queue
-			FSMState[] stateQTA = new FSMState[machine.StateQueue.Count];
-			machine.StateQueue.CopyTo(stateQTA, 0);
+			FSMState[] stateQTA = new FSMState[machine.StateStack.Count];
+			machine.StateStack.CopyTo(stateQTA, 0);
 
 			stateOnStyle.normal.background = TextureUtil.Texture2DSolidColor(new Vector2Int(2,2), Color.green);
 			stateOnStyle.alignment = TextAnchor.MiddleCenter;

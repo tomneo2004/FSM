@@ -41,16 +41,16 @@ namespace NP.FiniteStateMachine{
 		}
 
 		//State queue
-		readonly Stack<FSMState> stateQueue = new Stack<FSMState>();
+		readonly Stack<FSMState> stateStack = new Stack<FSMState>();
 
 		/**
-		 * Get state queue
+		 * Get state stack
 		 **/
-		public Stack<FSMState> StateQueue{
+		public Stack<FSMState> StateStack{
 
 			get{
 
-				return stateQueue;
+				return stateStack;
 			}
 		}
 
@@ -94,9 +94,9 @@ namespace NP.FiniteStateMachine{
 		 **/
 		private FSMState RunningState(){
 
-			if (stateQueue.Count > 0) {
+			if (stateStack.Count > 0) {
 
-				return stateQueue.Peek();
+				return stateStack.Peek();
 			}
 
 			#if DEBUG
@@ -132,7 +132,7 @@ namespace NP.FiniteStateMachine{
 				}
 
 				//push in new state
-				stateQueue.Push (inState);
+				stateStack.Push (inState);
 
 				//Tell new state to enter
 				(inState as IFSMState).OnEnter ();
@@ -160,7 +160,7 @@ namespace NP.FiniteStateMachine{
 				(popState as IFSMState).OnExit();
 
 				//Pop state
-				stateQueue.Pop();
+				stateStack.Pop();
 			}
 
 			//Tell next state to enter
@@ -171,6 +171,59 @@ namespace NP.FiniteStateMachine{
 			}
 
 			return popState;
+		}
+
+		/**
+		 * Pop state until certain state
+		 * 
+		 * If ignore is false OnEnter() and OnExit() will be called before state is popped, default is true
+		 **/
+		public virtual void PopStateUntil<StateType>(bool ignore = true) where StateType : FSMState{
+
+			bool found = false;
+
+			foreach (FSMState s in stateStack.ToArray()) {
+
+				if (s is StateType) {
+				
+					found = true;
+					break;
+				}
+			}
+
+			//Return if state not found in stack 
+			if (!found) {
+			
+				#if DEBUG
+				Debug.Log("Can not pop state until, state not exist in stack");
+				#endif
+				return;
+			}
+
+			if (RunningState()) {
+			
+				//Tell current running state to exit
+				(RunningState() as IFSMState).OnExit();
+
+				//Pop state
+				stateStack.Pop();
+			}
+
+			//Keep poping state until certain state
+			while (!(RunningState () is StateType)) {
+
+				if (!ignore) {
+				
+					(RunningState () as IFSMState).OnEnter ();
+					(RunningState () as IFSMState).OnExit ();
+				}
+
+				//Pop state
+				stateStack.Pop();
+			}
+
+			(RunningState () as IFSMState).OnEnter ();
+				
 		}
 
 		protected virtual bool ChangeState(FSMState toState){
@@ -190,11 +243,11 @@ namespace NP.FiniteStateMachine{
 			if (runningState) {
 
 				(runningState as IFSMState).OnExit ();
-				stateQueue.Pop ();
+				stateStack.Pop ();
 			}
 
 			//Push in new state and tell it to enter
-			stateQueue.Push(toState);
+			stateStack.Push(toState);
 			(toState as IFSMState).OnEnter ();
 
 			successful = true;

@@ -51,13 +51,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\FSM.cs" />
-     <Compile Include="Assets\FSMState.cs" />
-     <Compile Include="Assets\FSMTest\DefaultState.cs" />
-     <Compile Include="Assets\FSMTest\FSMTest.cs" />
-     <Compile Include="Assets\FSMTest\RunningState.cs" />
-     <Compile Include="Assets\FSMTest\WalkingState.cs" />
-     <Compile Include="Assets\Utility.cs" />
+     <Compile Include="Assets\FSM\FSM.cs" />
+     <Compile Include="Assets\FSM\FSMState.cs" />
+     <Compile Include="Assets\FSM\Utility.cs" />
+     <Compile Include="Assets\FSMTest\PlayerMovement\DefaultState.cs" />
+     <Compile Include="Assets\FSMTest\PlayerMovement\FSMTest.cs" />
+     <Compile Include="Assets\FSMTest\PlayerMovement\RunningState.cs" />
+     <Compile Include="Assets\FSMTest\PlayerMovement\WalkingState.cs" />
+     <Compile Include="Assets\FSMTest\RobotAI\AttackState.cs" />
+     <Compile Include="Assets\FSMTest\RobotAI\ChaseState.cs" />
+     <Compile Include="Assets\FSMTest\RobotAI\PatrolState.cs" />
+     <Compile Include="Assets\FSMTest\RobotAI\Robot.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
